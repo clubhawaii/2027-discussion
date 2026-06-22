@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2027 논술 캘린더 | 클럽하와이</title>
+<meta name="description" content="2027학년도 논술·약술형 전형 시험일 캘린더 — 인문·자연·메디컬 대학별 일정, 수능최저, 출제정보, 같은 날 동시 응시 가능 조합까지 한눈에.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="2027 논술 캘린더 | 클럽하와이">
+<meta property="og:description" content="2027학년도 논술·약술형 전형 시험일을 인문·자연·메디컬로 정리. 대학별 일정·수능최저·출제정보를 한눈에.">
+<meta property="og:image" content="클럽하와이 로고 (검정).png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --pink:#FF5F9F;
+    --ink:#191919; --sub:#9A9A9A; --line:#EDEDED; --bd:#E6E6E6; --muted-2:#BBBBBB;
+    --sat:#1d4ed8; --sun:#dc2626;
+    --inmun-bg:#f5f8ff; --inmun-bd:#d6e2f5; --inmun-tx:#3a5a8c; --inmun-tag:#3a5a8c;
+    --jayeon-bg:#f3faf6; --jayeon-bd:#cfe7d9; --jayeon-tx:#3a7a63; --jayeon-tag:#3a7a63;
+    --med-bg:#f9f6fd; --med-bd:#e4d8f0; --med-tx:#6a5a86; --med-tag:#6a5a86;
+    --sb-bg:#ffffff; --sb-bd:#E6E6E6; --sb-tx:#191919; --sb-tag:#191919;
+    --exam:#ffffff; --suneung:#191919; --paper:#ffffff; --board:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#fff; color:var(--ink);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    font-variant-numeric:tabular-nums;
+    -webkit-font-smoothing:antialiased; padding:24px 20px 72px;}
+  .wrap{max-width:1240px; margin:0 auto;}
+  .brandbar{display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); margin-bottom:18px;}
+  .brandlogo{height:32px; width:auto; display:block;}
+  header.top .eyebrow{font-size:13px; letter-spacing:.18em; color:var(--pink); font-weight:700;}
+  header.top h1{font-size:clamp(24px,5vw,32px); margin:7px 0 5px; letter-spacing:-.01em;}
+  header.top p{margin:0; color:var(--sub); font-size:15px;}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:16px; font-size:14px;}
+  .legend span{display:inline-flex; align-items:center; gap:6px; color:var(--sub);}
+  .dot{width:13px; height:13px; border-radius:3px; display:inline-block;}
+  .d-in{background:var(--inmun-tag);} .d-ja{background:var(--jayeon-tag);}
+  .d-md{background:var(--med-tag);} .d-su{background:var(--suneung);}
+  .hint{margin-top:10px; font-size:13px; color:var(--sub);}
+
+  /* 상단 고정 툴바 */
+  .toolbar{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px solid var(--line); padding:11px 0; margin:14px 0 10px;}
+  .tb-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .tb-sub{margin-top:9px;}
+  .search{display:flex; gap:8px; align-items:center; flex:1; min-width:200px; border:1.5px solid var(--line); border-radius:12px; padding:7px 8px 7px 14px;}
+  .search input{flex:1; border:none; outline:none; font-size:16px; font-family:inherit; color:var(--ink); background:transparent;}
+  .search input::placeholder{color:var(--muted-2);}
+  .search .qx{border:none; background:var(--line); color:var(--ink); width:30px; height:30px; border-radius:8px; font-size:13px; cursor:pointer; flex:0 0 auto; display:none;}
+  body.searching .search .qx{display:block;}
+  .chips{display:flex; gap:8px; flex-wrap:wrap;}
+  .chip{font-size:14px; font-weight:600; padding:8px 15px; border-radius:10px; border:1.5px solid var(--line); background:#fff; color:var(--sub); cursor:pointer;}
+  .chip.on{background:var(--pink); border-color:var(--pink); color:#fff;}
+  .qcount{font-size:12.5px; color:var(--sub); margin-left:auto; align-self:center;}
+
+  /* 달력 / 리스트 토글 */
+  .viewtoggle{display:flex; gap:8px;}
+  .vt{font-size:14px; font-weight:600; padding:9px 16px; border-radius:10px; border:1.5px solid var(--line); background:#fff; color:var(--sub); cursor:pointer;}
+  .vt.on{background:var(--ink); border-color:var(--ink); color:#fff;}
+
+  /* 카테고리 필터 (행 숨김) */
+  body.flt-in .row.jayeon, body.flt-in .row.med{display:none;}
+  body.flt-ja .row.inmun, body.flt-ja .row.med{display:none;}
+  body.flt-md .row.inmun, body.flt-md .row.jayeon{display:none;}
+
+  /* 검색 하이라이트 / 디밍 */
+/* 검색 시 해당 대학이 있는 날짜만 표시 */
+  body.searching .uni:not(.hit){
+    display:none;
+  }
+
+  body.searching .row.search-empty{
+    display:none;
+  }
+
+  body.searching td.day.exam.search-empty .row,
+  body.searching td.day.exam.search-empty .cmpbtn{
+    display:none;
+  }
+
+  body.searching #agenda .ag-card.search-empty{
+    display:none;
+  }
+
+  body.searching .uni.hit{
+    background:rgba(255,95,159,.18);
+    outline:1px solid var(--pink);
+    border-radius:3px;
+    border-bottom-color:transparent;
+  }
+
+  /* 하단 홍보(CTA) */
+  .promo{border:1px solid var(--line); border-radius:14px; padding:22px 20px; text-align:center; margin:26px 0 14px;}
+  .promo-h{font-size:18px; font-weight:700; color:var(--ink);}
+  .promo-h .pk{color:var(--pink);}
+  .promo-p{font-size:15px; color:var(--sub); margin-top:6px;}
+  .promo-btns{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px;}
+  .pbtn{display:inline-flex; align-items:center; gap:7px; font-size:15px; font-weight:700; padding:12px 20px; border-radius:10px; border:1.5px solid var(--line); background:#fff; color:var(--ink); text-decoration:none;}
+  .pbtn .ic{font-size:18px;}
+  .pbtn.primary{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .promo-pw{margin-top:14px; font-size:14px; color:var(--sub);}
+  .promo-pw b{color:var(--ink); font-weight:700;}
+
+  .month{background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 16px 20px; margin-bottom:22px;}
+
+  table.cal{width:100%; border-collapse:separate; border-spacing:7px; table-layout:fixed;}
+  table.cal th{font-size:14px; font-weight:700; color:var(--sub); padding:4px 0 8px; text-align:left; padding-left:4px;}
+  th.sat{color:var(--sat);} th.sun{color:var(--sun);}
+  td.day{vertical-align:top; min-height:120px; border:1px solid var(--line); border-radius:9px; padding:9px 10px; background:#fff;}
+  td.empty{background:transparent; border:1px dashed #F4F4F4;}
+  td.exam{background:var(--exam); border-color:var(--line);}
+  td.suneung{background:var(--suneung); border-color:var(--suneung);}
+  .dnum{font-size:16px; font-weight:800; line-height:1; margin-bottom:7px; display:block;}
+  td.sat .dnum{color:var(--sat);} td.sun .dnum{color:var(--sun);}
+
+  .row{display:block; border-radius:6px; padding:5px 7px; margin-bottom:5px; font-size:13px; line-height:1.45;}
+  .row .tag{display:inline-block; font-weight:700; font-size:11px; margin-right:5px; padding:1px 5px; border-radius:4px; vertical-align:1px; background:#fff; border:1px solid currentColor;}
+  .row.inmun{background:var(--inmun-bg); border:1px solid var(--inmun-bd); color:var(--inmun-tx);} .row.inmun .tag{color:var(--inmun-tag);}
+  .row.jayeon{background:var(--jayeon-bg); border:1px solid var(--jayeon-bd); color:var(--jayeon-tx);} .row.jayeon .tag{color:var(--jayeon-tag);}
+  .row.med{background:var(--med-bg); border:1px solid var(--med-bd); color:var(--med-tx);} .row.med .tag{color:var(--med-tag);}
+  .uni{cursor:pointer; border-bottom:1px dotted currentColor;}
+  .uni:hover{background:rgba(0,0,0,.06); border-radius:3px;}
+  .uni:active{background:rgba(255,95,159,.18); border-radius:4px;}
+  .uni,.cmpbtn,.chip,.vt,.pbtn,.utab{-webkit-tap-highlight-color:transparent;}
+  .cmpbtn:active{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .suneung td, td.suneung .dnum{color:#fff;}
+  .su-label{color:#fff; font-weight:800; font-size:16px; margin-top:5px;}
+  .su-sub{color:#cbd2e0; font-size:12.5px; margin-top:3px;}
+  footer{color:var(--sub); font-size:11.5px; text-align:center; margin-top:6px;}
+  footer .credit{margin-top:14px; padding-top:12px; border-top:1px solid var(--line); color:var(--ink); font-size:12.5px; font-weight:600;}
+  footer .copy{margin-top:5px; color:var(--muted-2); font-size:11.5px; line-height:1.6;}
+
+  /* 달력 / 리스트 표시 전환 */
+  .gridview,.agenda{display:none;}
+  body.view-cal .gridview{display:block;}
+  body.view-list .agenda{display:block;}
+
+  /* agenda (리스트 뷰) */
+  .agenda{max-width:880px; margin:0 auto;}
+  .ag-month{font-size:19px; font-weight:800; color:var(--ink); margin:20px 2px 9px;}
+  .ag-card{background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:11px;}
+  .ag-card.su{background:var(--suneung); border-color:var(--suneung);}
+  .ag-date{font-weight:800; font-size:16px; margin-bottom:8px;}
+  .ag-date.sat{color:var(--sat);} .ag-date.sun{color:var(--sun);}
+  .ag-card.su .ag-date{color:#fff;} .ag-su-sub{color:#cbd2e0; font-size:13px;}
+
+  /* modal */
+  .overlay{position:fixed; inset:0; background:rgba(25,25,25,.38); backdrop-filter:blur(2px); display:none; align-items:center; justify-content:center; padding:16px; z-index:50;}
+  .overlay.on{display:flex;}
+  @keyframes modalIn{from{opacity:0; transform:translateY(8px) scale(.99);} to{opacity:1; transform:none;}}
+  .modal{background:#fff; border-radius:20px; max-width:560px; width:100%; max-height:88vh; overflow:auto; border:1px solid #F1F1F1; box-shadow:0 12px 40px rgba(20,20,30,.12);}
+  .overlay.on .modal{animation:modalIn .18s ease;}
+  .modal .mhead{position:sticky; top:0; background:#fff; padding:18px 22px 12px; border-bottom:1px solid #F4F4F4; display:flex; align-items:flex-start; justify-content:space-between;}
+  .modal .mhead h3{margin:0; font-size:21px;}
+  .modal .mhead .x{cursor:pointer; border:none; background:#F4F4F4; width:33px; height:33px; border-radius:10px; font-size:16px; color:var(--ink); flex:0 0 auto; transition:background .15s ease;}
+  .modal .mhead .x:hover{background:var(--bd);}
+  .modal .mbody{padding:16px 22px 24px;}
+  .utabs{display:flex; gap:8px; margin:0 0 16px;}
+  .utab{font-size:14px; font-weight:600; padding:8px 16px; border-radius:10px; border:1.5px solid var(--line); background:#fff; color:var(--sub); cursor:pointer;}
+  .utab.on{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .cmp-uni{cursor:pointer; border-bottom:1px dotted currentColor;}
+  .cmp-uni:hover{color:var(--pink);}
+  .cln.cmp-uni{border-bottom:none; text-decoration:underline; text-decoration-style:dotted; text-underline-offset:2px;}
+  .cln.cmp-uni:hover{color:var(--pink);}
+  .kv{display:flex; gap:10px; font-size:14.5px; padding:7px 0; border-bottom:1px dashed #EFEFEF;}
+  .kv .k{flex:0 0 86px; color:var(--sub); font-weight:700;}
+  .kv-note{color:var(--sub); font-size:12.5px;}
+  .sect{margin-top:14px;}
+  .sect h4{margin:0 0 7px; font-size:14px;}
+  .sect h4.sb{color:var(--sb-tx);} .sect h4.in{color:var(--inmun-tx);} .sect h4.ja{color:var(--jayeon-tx);} .sect h4.md{color:var(--med-tx);}
+  .box{border-radius:12px; padding:11px 13px; font-size:14px; line-height:1.5;}
+  .box.ses{overflow:hidden;}
+  .box.sb{background:var(--sb-bg); border:1px solid var(--sb-bd);}
+  .box.in{background:var(--inmun-bg); border:1px solid var(--inmun-bd);}
+  .box.ja{background:var(--jayeon-bg); border:1px solid var(--jayeon-bd);}
+  .box.md{background:var(--med-bg); border:1px solid var(--med-bd);}
+  .box .base{font-weight:700;} .box ul{margin:6px 0 0; padding-left:18px;} .box li{margin:2px 0;}
+  .sbline{display:flex; gap:8px; padding:4px 0; font-size:14px;}
+  .sbline .sk{flex:0 0 80px; color:var(--sb-tx); font-weight:700;}
+  .sbnote{margin-top:5px; font-size:13px; color:var(--sub);}
+  .box.in .sk{color:var(--inmun-tx);}
+  .box.ja .sk{color:var(--jayeon-tx);}
+  .qline{font-size:13px; line-height:1.55; margin:2px 0;}
+
+  @media (max-width:760px){
+    .gridview{display:none!important;} .agenda{display:block!important;}
+    .viewtoggle{display:none;}
+    .toolbar{padding:9px 0;}
+    .search{flex-basis:100%;}
+    body{padding:24px 16px 72px;}
+
+    /* 리스트 카드 가독성 */
+    .ag-month{font-size:17px; margin:22px 2px 9px; padding-top:6px; border-top:1px solid var(--line);}
+    .ag-month:first-child{border-top:none; padding-top:0; margin-top:6px;}
+    .ag-card{padding:16px 16px; margin-bottom:12px; border-radius:14px;}
+    .ag-date{font-size:17px; margin-bottom:10px;}
+    .row{font-size:14px; line-height:1.7; padding:6px 8px;}
+    .row .tag{font-size:11.5px; margin-right:6px;}
+
+    /* 터치 타깃 — 손가락으로 누르기 쉽게 */
+    .uni{display:inline-block; padding:3px 4px; margin:1px 0;}
+    .cmpbtn{font-size:12px; padding:7px 12px; margin-top:8px;}
+
+    /* 하단 홍보·저작권 정리 */
+    .promo{padding:18px 16px;}
+    .promo-h{font-size:16.5px;}
+    .promo-p{font-size:14px;}
+    .promo-btns{flex-direction:column; gap:9px;}
+    .pbtn{width:100%; justify-content:center; padding:13px 18px;}
+    .promo-pw{margin-top:13px; font-size:13.5px;}
+    footer .credit{margin-top:16px;}
+    footer .copy{line-height:1.7;}
+
+    .modal{max-width:none; border-radius:18px 18px 0 0; align-self:flex-end; max-height:90vh;}
+    .overlay{align-items:flex-end; padding:0;}
+  }
+  @media print{ body{background:#fff;} .gridview{display:block!important;} .month{break-inside:avoid; box-shadow:none;} .hint,.overlay,.agenda,.viewtoggle,.toolbar,.promo{display:none;} }
+
+.sesmk{font-size:12px;opacity:.85}
+h4.ses{color:var(--ink)}
+.box.ses{border-color:var(--bd);background:#fff}
+table.sestbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:2px}
+table.sestbl th{background:var(--ink);color:#fff;font-weight:700;padding:5px 7px;text-align:left;font-size:12.5px}
+table.sestbl td{border-bottom:1px solid var(--line);padding:5px 7px;vertical-align:top}
+table.sestbl .sd{white-space:nowrap;font-weight:600;color:var(--ink)}
+table.sestbl .st{white-space:nowrap;font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;color:var(--ink);font-weight:600}
+table.sestbl .sy{white-space:nowrap;color:var(--sub)}
+table.sestbl .su{color:var(--ink);line-height:1.4}
+
+.cmpbtn{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--bd);border-radius:5px;padding:3px 8px;cursor:pointer;line-height:1.3}
+.cmpbtn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.modal.wide{max-width:820px}
+.cmpdesc{font-size:13px;color:var(--sub);margin:0 0 12px}
+.ctl{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:#fff;overflow-x:auto}
+.ctl-ticks,.clane{display:flex;align-items:center;min-width:660px}
+.ctl-ticks{height:16px;margin-bottom:3px}
+.cln{width:130px;flex:0 0 130px;font-size:12px;font-weight:700;color:var(--ink);padding-right:7px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctrack{position:relative;flex:1;height:36px;border-left:1px solid var(--line)}
+.ctl-ticks .ctrack{height:12px;border:none}
+.ctick{position:absolute;font-size:10px;color:var(--muted-2);transform:translateX(-50%);border-left:1px dashed var(--line);height:100%}
+.clane{margin:3px 0}
+.clane .ctrack{background:repeating-linear-gradient(90deg,transparent,transparent calc(100%/13 - 1px),#F4F4F4 calc(100%/13 - 1px),#F4F4F4 calc(100%/13))}
+.cblk{position:absolute;top:3px;height:30px;border-radius:6px;color:#fff;padding:3px 6px;overflow:hidden;line-height:1.1}
+.cblk b{font-size:10.5px;font-weight:800;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cblk .cbt{font-size:9.5px;opacity:.95;font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;}
+.cblk.cin{background:var(--inmun-tag)}.cblk.cja{background:var(--jayeon-tag)}.cblk.cmd{background:var(--med-tag)}.cblk.cetc{background:var(--sub)}
+.cblk.cest{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.28) 0 4px,transparent 4px 8px)}
+.cpar{margin-top:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.cmpgraph-h{font-size:14px;font-weight:800;color:var(--ink);margin:16px 0 4px}
+.cmpnote{font-size:12px;color:var(--sub);margin:0 0 8px}
+.cparh{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:6px}
+.cpar ul{margin:0;padding-left:17px}
+.cpar li{font-size:13.5px;margin:4px 0;color:var(--ink)}
+.cpar li b{color:var(--pink)}.cpar .cex{color:var(--sub);font-size:12.5px}
+.cpar .cnone{font-size:13px;color:var(--sub);margin:0}.cpar .cwarn{font-size:12.5px;color:var(--sub);margin:7px 0 0}
+.month h2{display:flex;justify-content:center;align-items:center;margin:2px 2px 14px;font-size:21px;font-weight:800;line-height:1;}
+.month h2 small{color:#888;font-weight:600;margin-left:8px;}
+.month h2 button{display:flex;align-items:center;justify-content:center;border:none;background:transparent;padding:0;margin:0 12px;width:24px;height:24px;font-size:18px;line-height:1;cursor:pointer;transform:translateY(2px);}
+</style>
+</head>
+<body class="view-cal flt-all">
+<div class="wrap">
+  <div class="brandbar"><img class="brandlogo" src="클럽하와이 로고 (검정).png" alt="클럽하와이"></div>
+  <header class="top">
+    <div class="eyebrow">2027학년도 · 약술형/논술 전형 시험일</div>
+    <h1>논술 캘린더 — 인문 · 자연 · 메디컬</h1>
+    <p>날짜별 시험 실시 대학. 인문 / 자연 / 메디컬</p>
+    <div class="hint">※ 대학명을 클릭(터치)하면 모집인원 · 수능최저 · 학생부 반영 등 대학별 상세가 표시됩니다.</div>
+  </header>
+  <div class="toolbar">
+    <div class="tb-row">
+      <div class="search">
+        <input id="q" type="search" placeholder="대학명 검색 (예: 한양)" autocomplete="off">
+        <button id="qx" class="qx" aria-label="검색 지우기">✕</button>
+      </div>
+      <div class="viewtoggle">
+        <button class="vt on" data-view="cal">📅 달력</button>
+        <button class="vt" data-view="list">📋 리스트</button>
+      </div>
+    </div>
+    <div class="tb-row tb-sub">
+      <div class="chips">
+        <button class="chip on" data-flt="all">전체</button>
+        <button class="chip" data-flt="in">인문</button>
+        <button class="chip" data-flt="ja">자연</button>
+        <button class="chip" data-flt="md">메디컬</button>
+      </div>
+      <div class="legend">
+        <span><i class="dot d-in"></i>인문</span><span><i class="dot d-ja"></i>자연</span>
+        <span><i class="dot d-md"></i>메디컬</span><span><i class="dot d-su"></i>수능일</span>
+      </div>
+      <span class="qcount" id="qcount"></span>
+    </div>
+  </div>
+<!--추가-->
+<div class="gridview">
+    <div id="grid"></div>
+</div>
+
+<div id="agenda" class="agenda"></div>
+  <section class="promo">
+    <div class="promo-h">더 많은 입시 소식을 <span class="pk">자주</span> 접하고 싶나요?</div>
+    <div class="promo-p">이즈유 오픈채팅방에서 매일 새로운 입시 소식을 받아보세요!</div>
+    <div class="promo-btns">
+      <a class="pbtn primary" href="https://open.kakao.com/o/gXlVMdff" target="_blank" rel="noopener"><span class="ic">💬</span>이즈유 오픈채팅 참여</a>
+      <a class="pbtn" href="https://blog.naver.com/isyou0943" target="_blank" rel="noopener"><span class="ic">📖</span>이즈유 블로그</a>
+    </div>
+    <div class="promo-pw">🔑 오픈채팅방 비밀번호: <b>isyou1</b></div>
+  </section>
+  <footer>
+    <div class="credit">제작: 김세형</div>
+    <div class="copy">모든 저작권은 (주)이즈유에 있으며, 무단 전재 및 재배포를 엄격히 금지합니다.<br>ⓒ2021. ISYOU all rights reserved.</div>
+  </footer>
+</div>
+<div class="overlay" id="ov"><div class="modal" id="modal"></div></div>
+
+<script>
+const DOW=["일","월","화","수","목","금","토"];
+const exams = {
+  "10-3":{ja:["시립","홍익","성신"]},
+  "10-4":{in:["홍익","성신"]},
+  "10-10":{in:["연세"],ja:["연세"]},
+  "10-11":{in:["중앙대(창의형)","가톨릭"],ja:["중앙대(창의형)","가톨릭"],md:["연세(약학)","중앙대(창의형)"]},
+  "10-16":{in:["연세(미래)","을지"],ja:["연세(미래)","을지"]},
+  "10-17":{ja:["단국","을지"]},
+  "10-18":{in:["단국"]},
+  "10-30":{in:["상명"]},
+  "10-31":{ja:["상명"]},
+  "11-1":{in:["서경"],ja:["서경"]},
+  "11-19":{suneung:true},
+  "11-21":{in:["건국","경희","성균관","숭실","서울여","숙명","항공"],ja:["건국","경희","고려","서강","숭실","서울여","숙명","수원","항공"],md:["건국","경희","숙명"]},
+  "11-22":{in:["경희","고려","동국","서강","숙명","수원","한국공학","홍익(세)"],ja:["경희","동국","성균관","한국공학","홍익(세)"],md:["성균관","동국","가톨릭"]},
+  "11-23":{in:["삼육"],ja:["삼육","서울과기대"]},
+  "11-24":{in:["삼육"],ja:["삼육"]},
+  "11-25":{in:["한국기술교"],ja:["한국기술교"]},
+  "11-27":{in:["경기"],ja:["경기"]},
+  "11-28":{in:["세종","한국외","한양","동덕","이화","강남","경북","부산","고려(세종)","한국외(글)"],ja:["광운","중앙","동덕","강남","경북","부산","고려(세종)"],md:["중앙","경북","부산","고려(세종)"]},
+  "11-29":{in:["광운","중앙","한국외","덕성","신한","한국외(글)"],ja:["세종","한양","한국외","덕성","이화","신한","한국외(글)"],md:["한양","덕성","이화","가천"]},
+  "11-30":{in:["가천"],ja:["가천"]},
+  "12-1":{ja:["가천"]},
+  "12-5":{in:["국민","인하","한신"],ja:["아주","한신"],md:["아주"]},
+  "12-6":{in:["아주"],ja:["국민","인하"],md:["인하"]},
+};
+const nameMap = {
+"시립":"서울시립대","홍익":"홍익대","성신":"성신여대","연세":"연세대","중앙대(창의형)":"중앙대(창의)","가톨릭":"가톨릭대","연세(미래)":"연세대(미래)","연세(약학)":"연세대","을지":"을지대","단국":"단국대","상명":"상명대","서경":"서경대","건국":"건국대","경희":"경희대","성균관":"성균관대","숭실":"숭실대","서울여":"서울여대","숙명":"숙명여대","항공":"한국항공대","고려":"고려대","고려(세종)":"고려대(세종)","서강":"서강대","동국":"동국대","수원":"수원대","한국공학":"한국공학대","홍익(세)":"홍익대(세종)","삼육":"삼육대","서울과기대":"서울과기대","한국기술교":"한국기술교대","경기":"경기대","세종":"세종대","한국외":"한국외국어대","한국외(글)":"한국외국어대(글로벌)","한양":"한양대","동덕":"동덕여대","이화":"이화여대","강남":"강남대","경북":"경북대","부산":"부산대","광운":"광운대","중앙":"중앙대(일반)","덕성":"덕성여대","신한":"신한대","가천":"가천대","국민":"국민대","인하":"인하대","한신":"한신대","아주":"아주대"
+};
+const NO="반영하지 않음", G100="논술 100%", GW="학년별 가중치 없음";
+const R={p100:"논술 100%",p8020:"논술 80% + 교과 20%",p9010:"논술 90% + 교과 10%",p7030:"논술 70% + 교과 30%",p702010:"논술 70% + 교과 20% + 출결 10%"};
+const U = {"가천대":{"r":1036,"i":"11/30(월)","j":"11/29~12/01(일~화)","t":"1/2","e":1,"ci":{"b":"국수영탐1 1합 3"},"cj":{"b":"국수영탐1 1합 3"},"med":["의예과: 국수(미기)영과(평균) 3합 3 (절사)","한의예과: 국수(미기)영과(평균) 2합 2","약학과: 국수(미기)영과(평균) 3합 5 (절사)","바이오로직스학과: 국수영탐1 2합 5"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"가톨릭대":{"r":176,"i":"10/11(일)","j":"10/11·11/22(일)","t":"1/2","e":1,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"med":["약학과: 국수영과1 3합 5","의예과: 국수영과(평균) 3합 4 (절사), 한국사 4등급","간호학과: 국수영탐1 3합 7"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"강남대":{"r":309,"i":"11/28(토)","j":"11/28(토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"c":"국수영사과+한국사 상위 20과목"},"gb":"학년별 가중치 없음"},"건국대":{"r":328,"i":"11/21(토)","j":"11/21(토)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 5, 한국사 5등급"},"cj":{"b":"국수영탐1 2합 5, 한국사 5등급"},"med":["수의예과: 국수영탐1 3합 4, 한국사 5등급"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"경기대":{"r":239,"i":"11/27(금)","j":"11/27(금)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 90% + 교과 10%","sb":{"c":"국수영사과+한국사"},"gb":"학년별 가중치 없음"},"경북대":{"r":544,"i":"11/28(토)","j":"11/28(토)","t":"1/2","e":1,"ci":{"b":"국수영탐1 2합 5/6"},"cj":{"b":"국수영탐1 2합 5/6"},"med":["모바일AI공학전공: 수(미기)과(평균) 2합 3 (절사)","의예과: 국수영탐(평균) 3합 4 (수학 포함)","치의예과: 국수영탐(평균) 3합 4 (수학 포함·절사)","수의예과·약학과: 국수영탐(평균) 3합 5 (수학 포함·절사)"],"rb":"논술 70% + 교과 30%","sb":{"c":"국수영사과+한국사"},"gb":"학년별 가중치 없음"},"경희대":{"r":471,"i":"11/21~22(토·일)","j":"11/21~22(토·일)","t":"2","e":1,"ci":{"b":"국수영탐(평균) 2합 5, 한국사 5등급","u":["체육: 국수영탐(평균) 1합 3"]},"cj":{"b":"국수영탐(평균) 2합 5, 한국사 5등급"},"med":["한의예과(인문): 국수영탐(평균) 3합 4, 한국사 5등급","의예과·치의예과·한의예과(자연)·약학과: 국수영탐(평균) 3합 4, 한국사 5등급"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"고려대":{"r":351,"i":"11/22(일)","j":"11/21(토)","t":"1","e":1,"ci":{"b":"국수영탐1 4합 8, 한국사 4등급"},"cj":{"b":"국수영탐1 4합 8, 한국사 4등급"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"고려대(세종)":{"r":308,"i":"11/28(토)","j":"11/28(토)","t":"1/2","e":1,"ci":{"b":"국수영탐1 2합 6","u":["자유전공: 국수영탐1 1합 3"]},"cj":{"b":"국수영탐1 2합 6"},"med":["약학과: 국수(미기)영과(평균) 3합 5"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"광운대":{"r":187,"i":"11/29(일)","j":"11/28(토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"c":"국수영사과+한국사"},"gb":"학년별 가중치 없음"},"국민대":{"r":205,"i":"12/5(토)","j":"12/6(일)","t":"1/1","e":1,"ci":{"b":"국수영탐1 2합 6"},"cj":{"b":"국수영과1 2합 6 (과탐1과목)"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"단국대":{"r":310,"i":"10/18(일)","j":"10/17(토)","t":"","e":1,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 90% + 교과 10%","sb":{"c":"국수영사과+한국사"},"gb":"학년별 가중치 없음"},"덕성여대":{"r":120,"i":"11/29(일)","j":"11/29(일)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 7 (제2외국어 영어대체)"},"cj":{"b":"국수영탐1 2합 7"},"med":["약학과: 국수영탐1 3합 5 (수학 포함, 사탐·영어 동시 적용 불가)"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"동국대":{"r":282,"i":"11/22(일)","j":"11/22(일)","t":"1/1","e":1,"ci":{"b":"국수영탐1 2합 5, 한국사 4등급","u":["경찰행정학부: 국수영탐1 2합 4, 한국사 4등급","컴퓨터AI: 국수영탐1 2합 5(수학 포함), 한국사 4등급"]},"cj":{"b":"국수영탐1 2합 5 (과탐1과목·수·과 중 1 포함), 한국사 4등급","u":["컴퓨터AI: 국수영탐1 2합 5, 한국사 4등급 (수·과 중 1 포함)"]},"med":["약학과: 국수영탐1 3합 4 (과탐1·수 또는 과 1 포함), 한국사 4등급"],"rb":"논술 70% + 교과 20% + 출결 10%","sb":{"c":"국수영사과+한국사 상위 10과목 (이수단위 미반영)"},"gb":"학년별 가중치 없음"},"동덕여대":{"r":266,"i":"11/28(토)","j":"11/28(토)","t":"","e":0,"ci":{"b":"국수영탐1 2합 6"},"cj":{"b":"국수영탐1 2합 6"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"부산대":{"r":342,"i":"11/28(토)","j":"11/28(토)","t":"1/2","e":1,"ci":{"b":"국수영탐1 2합 5, 한국사 4등급","u":["경영대학: 국수영탐1 3합 7, 한국사 4등급"]},"cj":{"b":"국수영탐1 2합 5 (수학 포함·과탐 1과목 필수응시), 한국사 4등급","u":["첨단소재자율전공·AX융합학부 스마트시티: 국수영탐1 2합 5 (수학 포함, 과탐 강제 없음)"]},"med":["의예과: 국수영탐(평균) 3합 4 (수학 포함), 한국사 4등급","약학부: 국수영탐1 3합 4 (수학 포함), 한국사 4등급"],"rb":"논술 80% + 교과 20%","sb":{"c":"국수영사과+한국사"},"gb":"학년별 가중치 없음"},"삼육대":{"r":277,"i":"11/23~24(월·화)","j":"11/23~24(월·화)","t":"1","e":1,"ci":{"b":"국수영탐1 1합 3"},"cj":{"b":"국수영탐1 1합 3"},"med":["약학과: 국수(미기)영과1 3합 5"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"상명대":{"r":98,"i":"10/30(금)","j":"10/31(토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 90% + 교과 10%","sb":{"c":"전 교과"},"gb":"학년별 가중치 없음"},"서강대":{"r":171,"i":"11/22(일)","j":"11/21(토)","t":"1","e":1,"ci":{"b":"국수영탐1 3합 7, 한국사 4등급"},"cj":{"b":"국수영탐1 3합 7, 한국사 4등급"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"서경대":{"r":214,"i":"11/1(일)","j":"—","t":"","e":0,"ci":{"b":"미적용"},"cj":null,"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"서울과기대":{"r":162,"i":"—","j":"11/23(월)","t":"","e":0,"ci":null,"cj":{"b":"미적용"},"rb":"논술 70% + 교과 30%","sb":{"j":"국수영과"},"gb":"학년별 가중치 없음"},"서울시립대":{"r":88,"i":"—","j":"10/3(토)","t":"","e":0,"ci":null,"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"j":"전 교과"},"gb":"학년별 가중치 없음"},"서울여대":{"r":120,"i":"11/21(토)","j":"11/21(토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"c":"국수영사과"},"gb":"학년별 가중치 없음"},"성균관대":{"r":376,"i":"11/21(토)","j":"11/22(일)","t":"2","e":1,"ci":{"b":"국수영탐(평균) 3합 6","u":["글로벌 리더·글로벌 경영·글로벌 경제·자유전공: 국수영탐(평균) 3합 5"]},"cj":{"b":"국수영탐(평균) 3합 6","u":["반도체시스템·소프트웨어·글로벌바이오메디컬·지능형소프트웨어학과·반도체융합공학과·자유전공계열·에너지학과: 국수영탐(평균) 3합 5"]},"med":["약학과: 국수영탐(평균) 3합 5","의예과: 국수영탐(평균) 4합 5"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"성신여대":{"r":319,"i":"10/4(일)","j":"10/3(토)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 7"},"cj":{"b":"국수영탐1 2합 7"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"세종대":{"r":344,"i":"11/28(토)","j":"11/29(일)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 5"},"cj":{"b":"국수영탐1 2합 5"},"rb":"논술 80% + 교과 20%","sb":{"i":"국수영사 (자유전공: 국수영)","j":"국수영과"},"gb":"학년별 가중치 없음"},"수원대":{"r":434,"i":"11/22(일)","j":"11/21(토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"i":"국수영사 (자유전공: 국수영사과)","j":"국수영과","n":"교과별 상위 5과목 높은 순 30·30·25·15 반영"},"gb":"학년별 가중치 없음"},"숙명여대":{"r":214,"i":"11/21~22(토·일)","j":"11/21(토)","t":"","e":0,"ci":{"b":"국수영탐1 2합 5"},"cj":{"b":"국수영탐1 2합 5"},"med":["약학부: 국수영탐1 3합 4 (수학 포함)"],"rb":"논술 90% + 교과 10%","sb":{"c":"국수영사과+한국사"},"gb":"학년별 가중치 없음"},"숭실대":{"r":248,"i":"11/21(토)","j":"11/21(토)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 6"},"cj":{"b":"국수영탐1 2합 6"},"rb":"논술 90% + 교과 10%","sb":{"i":"국수영사+한국사","j":"국수영과"},"gb":"학년별 가중치 없음"},"신한대":{"r":186,"i":"11/29(일)","j":"11/29(일)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 90% + 교과 10%","sb":{"c":"국수영사과+한국사 우수 10개 과목"},"gb":"학년별 가중치 없음"},"아주대":{"r":182,"i":"12/5~6(토·일)","j":"12/5~6(토·일)","t":"2","e":1,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"med":["의학과: 국수영탐(평균) 4합 6 (무반올림·무절사)","약학과: 국수영탐(평균) 3합 5 (무반올림·무절사)"],"rb":"논술 80% + 교과 20%","sb":{"c":"국수영사과"},"gb":"학년별 가중치 없음"},"연세대":{"r":288,"i":"10/10(토)","j":"10/10(토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"연세대(미래)":{"r":182,"i":"10/16(금)","j":"10/16(금)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 90% + 교과 10%","sb":{"c":"국수영사과+한국사 상위 10개 과목"},"gb":"학년별 가중치 없음"},"을지대":{"r":214,"i":"10/16~17(금·토)","j":"10/16~17(금·토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"c":"국수영사과+한국사"},"gb":"학년별 가중치 없음"},"이화여대":{"r":297,"i":"11/28(토)","j":"11/29(일)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 5 (국어 포함)","u":["스크랜튼학부: 국수영탐1 3합 5"]},"cj":{"b":"국수영탐1 2합 5 (수학 포함)","u":["스크랜튼학부: 국수영탐1 3합 5"]},"med":["의예과: 국수영탐1 4합 5","약학전공: 국수영탐1 4합 6"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"인하대":{"r":457,"i":"12/5(토)","j":"12/6(일)","t":"2","e":1,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"med":["의예과: 국수영과(평균) 3합 3"],"rb":"논술 80% + 교과 20%","sb":{"i":"국수영사+한국사 (자유전공: 국수영사과)","j":"국수영과"},"gb":"학년별 가중치 없음"},"중앙대(창의)":{"r":86,"i":"10/11(일)","j":"10/11(일)","t":"1/2","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 70% + 교과 20% + 출결 10%","sb":{"c":"국수영사과 상위 5과목"},"gb":"학년별 가중치 없음"},"중앙대(일반)":{"r":403,"i":"11/29(일)","j":"11/28(토)","t":"1/2","e":1,"ci":{"b":"국수영탐1 3합 6 (영어 2등급 1등급 보정), 한국사 4등급 (다빈치 캠퍼스 미적용)"},"cj":{"b":"국수영탐1 3합 6 (영어 2등급 1등급 보정), 한국사 4등급 (다빈치 캠퍼스 미적용)"},"med":["의학부: 국수영탐(평균) 4합 5, 한국사 4등급","약학부: 국수영탐1 4합 5, 한국사 4등급"],"rb":"논술 70% + 교과 20% + 출결 10%","sb":{"c":"국수영사과 상위 5과목"},"gb":"학년별 가중치 없음"},"한국공학대":{"r":200,"i":"11/22(일)","j":"11/22(일)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"i":"국수영, 사 또는 과 (이수단위순)","j":"국수영과"},"gb":"학년별 가중치 없음"},"한국기술교대":{"r":150,"i":"11/25(수)","j":"11/25(수)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"한국외국어대":{"r":284,"i":"11/28~29(토·일)","j":"11/29(일)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 4"},"cj":{"b":"국수영탐1 2합 4"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"한국외국어대(글로벌)":{"r":168,"i":"11/28~29(토·일)","j":"11/29(일)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 6"},"cj":{"b":"국수영탐1 2합 6"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"한국항공대":{"r":198,"i":"11/21(토)","j":"11/21(토)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 6"},"cj":{"b":"국수영탐1 2합 6"},"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"한신대":{"r":231,"i":"12/5(토)","j":"12/5(토)","t":"","e":0,"ci":{"b":"미적용"},"cj":{"b":"미적용"},"rb":"논술 80% + 교과 20%","sb":{"c":"국수영사과+한국사 중 상위 12과목"},"gb":"학년별 가중치 없음"},"한양대":{"r":233,"i":"11/28(토)","j":"11/29(일)","t":"1/2","e":1,"ci":{"b":"국수영탐1 3합 7"},"cj":{"b":"국수영탐1 3합 7"},"med":["의예과: 국수영탐(평균) 3합 4"],"rb":"논술 100%","sb":"반영하지 않음","gb":"논술 100%"},"홍익대":{"r":384,"i":"10/4(일)","j":"10/3(토)","t":"1","e":1,"ci":{"b":"국수영탐1 2합 5, 한국사 4등급"},"cj":{"b":"국수영탐1 2합 5, 한국사 4등급"},"rb":"논술 90% + 교과 10%","sb":{"c":"국수영, 사 또는 과 (이수단위순) — 각 교과별 상위 3과목씩 총 12과목"},"gb":"학년별 가중치 없음"},"홍익대(세종)":{"r":195,"i":"11/22(일)","j":"11/22(일)","t":"1","e":1,"ci":{"b":"국수영탐1 1합 4"},"cj":{"b":"국수영탐1 1합 4"},"rb":"논술 90% + 교과 10%","sb":{"c":"국수영, 사 또는 과 (이수단위순) — 각 교과별 상위 3과목씩 총 12과목"},"gb":"학년별 가중치 없음"}};
+
+/* 인문논술 출제정보: 출제유형 / 시간(분) / 2026학년도 문항별 출제과목 */
+const SES = {"한국외국어대":{"note":"전 모집단위 서울캠퍼스 시행","rows":[{"d":"11/28(토)","t":"T1 10:00~11:30","ty":"인문","u":"[서울] 영어대·서양어대·중국학대·자유전공(서울)"},{"d":"11/28(토)","t":"T2 15:00~16:30","ty":"사회","u":"[서울] 사회과학대·상경대·Language&Diplomacy·Language&Trade·Social Science&AI융합 / [글로벌] 경상대·Finance&AI융합"},{"d":"11/29(일)","t":"T3 10:00~11:30","ty":"인문","u":"[서울] 아시아언어문화대·일본학대 / [글로벌] 인문대·융합인재대·Culture&Technology·자유전공(글로벌)"},{"d":"11/29(일)","t":"T4 15:00~16:30","ty":"사회+자연","u":"[사회·서울] 경영대·국제학부 / [자연·서울] Language&AI융합·AI융합(서울)통합 / [자연·글로벌] AI융합(글로벌)통합·자연과학·공과·바이오메디컬·AI데이터융합·기후변화융합"}]},"한국외국어대(글로벌)":{"ref":"한국외국어대"},"한양대":{"rows":[{"d":"11/28(토)","t":"오전 09:30~11:00","ty":"상경","u":"정보시스템(상경)·정책학과·경제금융·경영·파이낸스경영·한양인터칼리지(인문)"},{"d":"11/28(토)","t":"오후1 13:30~15:00","ty":"인문","u":"국어국문·사학·철학·연극영화(영화)"},{"d":"11/28(토)","t":"오후2 17:00~18:30","ty":"인문","u":"정치외교·사회학·미디어커뮤니케이션·관광"},{"d":"11/29(일)","t":"오전 09:30~11:00","ty":"자연","u":"건축학부·건축공학·건설환경·도시공학·간호·식품영양·한양인터칼리지(자연)"},{"d":"11/29(일)","t":"오후1 13:30~15:00","ty":"자연","u":"전기공학·신소재·화학공학·기계·산업공학·수학·물리·화학·생명과학·수학교육"},{"d":"11/29(일)","t":"오후2 17:00~18:30","ty":"자연","u":"융합전자·컴퓨터소프트웨어·미래자동차·반도체공학·의예과"}]},"한국공학대":{"rows":[{"d":"11/22(일)","t":"오전 10:00","ty":"자연","u":"AI융합 자율전공·경영 자율전공·자유전공학부"},{"d":"11/22(일)","t":"오후 14:30","ty":"자연","u":"IT반도체융합·스마트기계융합·첨단융합 자율전공"}]},"한국기술교대":{"rows":[{"d":"11/25(수)","t":"A그룹 10:00~11:20","ty":"공학","u":"공학융합계열(기계·메카·디자인·건축·에너지신소재·화학생명·공학융합자율)"},{"d":"11/25(수)","t":"B그룹 14:00~15:20","ty":"ICT·사회","u":"ICT융합(전기·전자·AI정보통신·컴퓨터·AI소프트웨어·ICT융합자율) + 사회융합(융합경영·데이터경영·고용서비스정책·사회융합자율)"}]},"한국항공대":{"rows":[{"d":"11/21(토)","t":"오전 10:00~11:30","ty":"자연","u":"공과대·AI융합대·자유전공(공학적성)"},{"d":"11/21(토)","t":"오후 15:00~16:30","ty":"자연·사회","u":"항공경영대(이학적성)·항공경영대(사회적성)·항공운항·자유전공(이학적성)·자유전공(사회적성)"}]},"한신대":{"rows":[{"d":"12/5(토)","t":"오전 10:00~11:20","ty":"인문","u":"인문계열 전체"},{"d":"12/5(토)","t":"오후 14:30~15:50","ty":"자연","u":"금융공학·빅데이터융합·AI·SW학·AI시스템반도체학"}]},"강남대":{"rows":[{"d":"11/28(토)","t":"오전 10:00","ty":"인문","u":"인문사회계"},{"d":"11/28(토)","t":"오후 14:00","ty":"공학","u":"공학계·자유전공학부"}]},"중앙대(창의)":{"note":"재학생(고3)만 지원","rows":[{"d":"10/11(일)","t":"오전 10:00~12:00","ty":"인문","u":"인문계열"},{"d":"10/11(일)","t":"오후 14:00~16:00","ty":"자연","u":"자연계열"}]},"중앙대(일반)":{"note":"인문·자연 일자 분리 / 정확 시각 모집요강 확인","rows":[{"d":"11/28(토)","t":"자연계열","ty":"자연","u":"서울캠 자연계열 · 다빈치캠"},{"d":"11/29(일)","t":"인문계열","ty":"인문","u":"서울캠 인문계열"}]},"서강대":{"rows":[{"d":"11/21(토)","t":"1교시 16:00~17:40","ty":"자연","u":"수학·전자·기계·인공지능"},{"d":"11/21(토)","t":"2교시 19:00~20:40","ty":"자연","u":"물리·화공생명·컴퓨터·시스템반도체"},{"d":"11/22(일)","t":"1교시 16:00~17:40","ty":"인문","u":"인문·영문·사회과학·지식융합미디어"},{"d":"11/22(일)","t":"2교시 19:00~20:40","ty":"인문","u":"경제·경영"}]},"성균관대":{"note":"언어형·수리형 별개 전형(중복지원 가능)","rows":[{"d":"11/21(토)","t":"언어형 1교시 08:30~10:10","ty":"언어","u":"자유전공·글로벌경제·글로벌리더·사회과학·건설환경·공학·전자전기정보"},{"d":"11/21(토)","t":"언어형 2교시 13:00~14:40","ty":"언어","u":"인문과학·경영·글로벌경영·글로벌AI융합·자연과학·컴퓨터"},{"d":"11/22(일)","t":"수리형 1교시 08:30~10:10","ty":"수리","u":"건설환경·경영·글로벌바이오메디컬·글로벌AI융합·반도체시스템·반도체융합·사회과학·컴퓨터·에너지·인공지능·전자전기정보·지능형소프트웨어"},{"d":"11/22(일)","t":"수리형 2교시 13:00~14:40","ty":"수리","u":"공학·자연과학"},{"d":"11/22(일)","t":"수리형 3교시 17:00~18:40","ty":"수리","u":"글로벌경영·글로벌경제·글로벌리더·약학·의예·자유전공"}]},"세종대":{"rows":[{"d":"11/28(토)","t":"09:00~11:00","ty":"인문","u":"인문계열 전체"},{"d":"11/28(토)","t":"14:00~16:00","ty":"자유전공","u":"자유전공학부"},{"d":"11/29(일)","t":"09:00~11:00","ty":"자연","u":"인공지능융합대학"},{"d":"11/29(일)","t":"14:00~16:00","ty":"자연","u":"자연과학·생명과학·공과대학"}]},"숭실대":{"rows":[{"d":"11/21(토)","t":"1교시 10:00~11:40","ty":"자연","u":"자연계열"},{"d":"11/21(토)","t":"2교시 15:00~16:40","ty":"인문·경상","u":"인문·경상계열"}]},"아주대":{"rows":[{"d":"12/5(토)","t":"09:00","ty":"자연","u":"공과·자연과학·자유전공(자연)"},{"d":"12/5(토)","t":"14:00","ty":"자연","u":"첨단ICT·소프트웨어"},{"d":"12/5(토)","t":"19:00","ty":"메디컬","u":"의학과"},{"d":"12/6(일)","t":"09:00","ty":"인문","u":"경영·인문·사회과학·자유전공(인문)"},{"d":"12/6(일)","t":"14:00","ty":"메디컬","u":"약학과"}]},"을지대":{"note":"전 고사 성남캠퍼스 시행","rows":[{"d":"10/16(금)","t":"1교시 10:00~11:10","ty":"자연·인문","u":"간호(성남)·간호(의정부)·자유전공"},{"d":"10/16(금)","t":"2교시 15:00~16:10","ty":"자연·인문","u":"첨단·자연계열·인문사회계열"},{"d":"10/17(토)","t":"1교시 10:00~11:10","ty":"자연","u":"임상병리(성남·의정부)·방사선·물리치료"},{"d":"10/17(토)","t":"2교시 15:00~16:10","ty":"자연·인문","u":"안경광학·응급구조·치위생·의료경영 / 사회기여·배려 전체"}]},"이화여대":{"rows":[{"d":"11/28(토)","t":"인문Ⅰ 08:30~12:10","ty":"인문","u":"인문과학대학"},{"d":"11/28(토)","t":"인문Ⅱ 14:20~18:00","ty":"인문","u":"사회과학·경영·신산업융합(의류산업·국제사무)"},{"d":"11/29(일)","t":"자연Ⅰ 08:30~12:10","ty":"자연","u":"자연과학·공과·인공지능·신산업융합(융합콘텐츠·식품영양·융합보건)·간호"},{"d":"11/29(일)","t":"자연Ⅱ 14:20~18:00","ty":"메디컬","u":"의예과·약학전공"}]},"홍익대":{"note":"계열별 일자 분리","rows":[{"d":"10/3(토)","t":"자연","ty":"자연","u":"자연계열·캠퍼스자율전공(자연·예능)"},{"d":"10/4(일)","t":"인문","ty":"인문","u":"인문계열·예술학과·캠퍼스자율전공(인문·예능)"}]}};
+const IN = {
+"가천대":{ot:"약술형 — 국어(8문항)+수학(5문항)",tm:80,q:["1~9번: 1학년 국어·문학·독서·화법과작문·언어와매체(문법)","10~15번: 수학Ⅰ·수학Ⅱ"]},
+"가톨릭대":{ot:"언어논술(3문항)",tm:90,q:["독서·화법과작문·생활과윤리 / 독서·경제 / 독서·화법과작문"]},
+"강남대":{ot:"약술형 — 인문사회 국어(4)+수학(2) · 자유전공 국어(5)+수학(5)",tm:60,q:["인문: 1~3번 문학·4~8번 독서 / 9번 수Ⅰ·10번 수Ⅱ","자전: 1·5번 문학·2~4번 독서 / 6·8번 수Ⅰ·7·9~10번 수Ⅱ"]},
+"건국대":{ot:"인문 언어논술(2문항·도표자료 포함) · 통합 언어논술(1문항)+수학(3문항)",tm:100,q:["인문: 국어·화작·독서·문학·언매·통합사회·사문·한지·윤사·생윤","통합: 국어·화작·독서·통사 / 수학·수Ⅱ"]},
+"경기대":{ot:"언어영역(1문항)+사회영역(1문항)",tm:100,q:["언어사회A: 문학 / 한국사·통합사회·정법","언어사회B: 국어·문학 / 통합사회·생윤·세계사"]},
+"경북대":{ot:"언어(6문항·문항당 소문항 있음)",tm:100,q:["국어·문학 / 경제 / 독서·생윤·통합사회 / 사문 / 국어·생윤 / 통합사회·사문·생윤"]},
+"경희대":{ot:"통합형 논술(2문항)",tm:120,q:["인문·체육: 국어·문학·독서·화작·언매·통합사회 / 국어·독서·화작·언매·문학·통사·윤사","사회: 윤사·생윤·통사·경제·문학·국어·독서·화작 등 (3문항군)"]},
+"고려대":{ot:"인문/사회 통합형 논술",tm:80,q:["오전: 문학·한국사·생윤·윤사·세계사·사문·통사·통과","오후: 문학·국어·세계사·세지·통사·경제·사문·윤사·통과"]},
+"고려대(세종)":{ot:"통합논술(2문항 내외)",tm:120,q:["국어·독서·문학·한국사·윤사 / 통사·경제·정법·사문·독서·생윤"]},
+"광운대":{ot:"통합교과형 논술(2문항)",tm:120,q:["1교시: 문학·독서·윤사 / 통사·독서·국어·윤사","2교시: 국어·독서·화작·생윤 / 언매·생윤·정법·사문·경제"]},
+"국민대":{ot:"약술형 — 국어(8문항)+수학(2문항)",tm:90,q:["오전: 독서/국어·문학/국어·독서/독서/독서/독서/국어·독서/독서/수Ⅰ/수Ⅰ·수Ⅱ","오후1: 독서/국어·독서/독서/독서/국어/독서·문학/독서/문학/수Ⅱ/수학·수Ⅰ","오후2: 독서·문학/국어·독서/독서/독서·문학/독서·문학/독서/국어·문학/독서/수Ⅰ/수Ⅰ"]},
+"단국대":{ot:"인문/사회 통합교과형(2문항)",tm:120,q:["오전: 국어·독서·화작·문학·통사·정법·윤사·생윤 / 국어·독서·화작·통사·사문","오후: 국어·독서·화작·문학·통사·정법·윤사 / 국어·독서·화작·통사·경제"]},
+"덕성여대":{ot:"언어논술(2문항)",tm:90,q:["국어·문학·독서·동아시아사 / 통사·생윤·철학·국어"]},
+"동국대":{ot:"언어논술(3문항)",tm:100,q:["인문Ⅰ: 독서·문학·생윤·윤사 / 문학·생윤·언매·윤사 / 경제·윤사","인문Ⅱ: 독서·사문·언매·윤사 / 사문·세계사·정법·한국사 / 문학·윤사·통사"]},
+"동덕여대":{ot:"약술형 — 국어(6문항)+수학(2문항)",tm:60,q:["인문사회Ⅰ: 독서·실용국어·통사·윤사·생윤·고전과윤리 / 경제·생윤·정법","인문사회Ⅱ: 국어·독서·수학·경제 / 독서·실용국어·통사·사문·윤사·생윤"]},
+"부산대":{ot:"언어논술(3문항)",tm:100,q:["국어·독서·문학·생윤·윤사·세계사 / 국어·화작·독서·언매·통사·정법·생윤·윤사 / 국어·화작·독서·문학·통사·생윤·사문"]},
+"삼육대":{ot:"국어(8문항)+수학(5문항)",tm:80,q:["문항순: 화작·화작·언매·독서·독서·독서·문학·문학·문학·수Ⅱ·수Ⅱ·수Ⅱ·수Ⅰ·수Ⅱ·수Ⅰ"]},
+"상명대":{ot:"약술형 — 국어(8문항)+수학(2문항)",tm:60,q:["A형: 독서·언매·독서·국어·문학·화작·독서·독서·수Ⅰ·수Ⅱ","B형: 언매·독서·독서·언매·문학·화작·화작·독서·수Ⅰ·수Ⅱ"]},
+"서강대":{ot:"인문/사회 통합교과형 논술(2문항)",tm:100,q:["1차: 국어·독서·문학·통사·경제·사문 / 국어·화작·언매·사문·세계사","2차: 독서·통사·경제·사문·생윤 / 독서·언매·문학·경제·사문"]},
+"서경대":{ot:"약술형 — 국어(4문항)+수학(4문항)",tm:60,q:["A형: 독서·독서·문학·문학·수Ⅱ·수Ⅰ·수Ⅰ·수Ⅱ","B형: 독서·독서·문학·문학·수Ⅰ·수Ⅱ·수Ⅱ·수Ⅰ"]},
+"서울여대":{ot:"통합교과형(2문항)",tm:90,q:["국어·독서·언매 / 통사·생윤·독서·세지"]},
+"성균관대":{ot:"언어논술(3문항)",tm:100,q:["1교시: 통사·사문·정법·윤사·생윤·화작 (+한지) / 통사·사문·윤사·생윤·화작","2교시: 통사·정법·윤사·생윤·화작 (+독서) / 통사·정법·윤사·생윤·화작"]},
+"성신여대":{ot:"통합교과형 논술(2문항)",tm:100,q:["1교시: 국어·화작·독서·생윤·윤사·통사·한지·세지·경제·정법·사문","2교시: 국어·화작·독서·생윤·통사·사문·경제"]},
+"세종대":{ot:"인문 인문논술 · 자유전공학부 통합교과형",tm:120,q:["독서·국어·한국사 / 독서·국어·한국사"]},
+"수원대":{ot:"약술형 논술 — 국어(10문항)+수학(5문항)",tm:80,q:["1~6번 독서·7~10번 문학·11~12번 수Ⅰ·13~15번 수Ⅱ (C·D형 공통)"]},
+"숙명여대":{ot:"통합논술형(2문항)",tm:120,q:["1회: 통사·생윤 / 통사·생윤·윤사","2회: 통사·사문·한지 / 문학·독서·윤사"]},
+"숭실대":{ot:"인문 언어논술(2~4문항) · 경상 언어논술+수리논술(2~4문항)",tm:100,q:["인문: 국어·독서·실용국어·통사 / 생윤·사회문제탐구","경상: 경제 / 경제·사문·수학"]},
+"신한대":{ot:"국어(7문항)+수학(7문항)",tm:80,q:["1~2번 문학·3~7번 독서·8~9번 문학 / 10~12번 수Ⅰ·13~15번 수Ⅱ"]},
+"아주대":{ot:"통합논술(언어·사회, 2문항)",tm:120,q:["독서·고전 / 생윤·정법"]},
+"연세대":{ot:"다면사고형 논술(인문·사회 교과 통합형)",tm:120,q:["인문: 국어·화작·독서·심화국어·고전읽기·윤사·생윤·통사·사문·사회문제탐구·영어Ⅰ·영어Ⅱ·영어독해와작문","자연: +수학·수Ⅱ"]},
+"연세대(미래)":{ot:"통합 논술(인문·사회과학적 사고력)",tm:120,q:["독서·윤사 / 경제"]},
+"을지대":{ot:"약술형 논술 — 국어(7문항)+수학(7문항)",tm:70,q:["1~7번 언매·독서·문학 / 8~14번 수Ⅰ·수Ⅱ"]},
+"이화여대":{ot:"언어논술",tm:100,q:["인문Ⅰ: 독서 / 독서·문학 / 독서·문학·영어독해와작문","인문Ⅱ: 독서·윤사 / 독서·실용국어·언매 / 경제"]},
+"인하대":{ot:"언어논술(인문학+사회과학)",tm:100,q:["국어·화작·언매·생윤·윤사·통사·한지·경제·사문"]},
+"중앙대(창의)":{ot:"언어논술(3문항)",tm:120,q:["인문사회: 국어·문학 / 문학·독서 / 독서·통사·경제","경영경제: 국어 / 국어·문학·생윤 / 확통"]},
+"중앙대(일반)":{ot:"인문사회 언어논술(3문항) · 경영경제 언어논술(2)+수리논술(1)",tm:120,q:["인문사회: 국어·문학 / 문학·독서 / 독서·통사·경제","경영경제: 국어 / 국어·문학·생윤 / 확통"]},
+"한국공학대":{ot:"수리논술(9문항)",tm:80,q:["경영학부: 1~4번 수Ⅰ·5~9번 수Ⅱ"]},
+"한국기술교대":{ot:"자료제시형 언어논술(10문항 내외·단답/약술형 서술)",tm:80,q:["사회계열: 통합사회 11문항"]},
+"한국외국어대":{ot:"통합교과형",tm:90,q:["인문T1: 국어·화작·문학·독서·한국사·동사·사문·경제·통사·생윤·미술 / 국어·화작·문학·독서·한국사 / 국어·화작·문학·독서·영어Ⅰ","인문T3: 국어·독서·화작·문학·경제·미술 / 국어·독서·문학·미술 / 국어·독서·영어Ⅱ·영어독해와작문·사문","사회T2: 국어·독서·화작·문학·통사·미술 / 국어·독서 / 국어·독서","사회T4: 국어·화작·독서·통사·경제·생윤·윤사 (×2) / 국어·화작·독서·통사·경제"]},
+"한국외국어대(글로벌)":{ot:"통합교과형 (글로벌 포함, 본교와 동일 체계)",tm:90,q:["인문T1: 국어·화작·문학·독서·한국사·동사·사문·경제·통사·생윤·미술 등","인문T3 / 사회T2 / 사회T4 트랙별 출제 (본교 한국외국어대와 동일)"]},
+"한국항공대":{ot:"언어논술(2문항)",tm:90,q:["국어·문학·화작·독서·통사·생윤 / 통사·사문·한지·경제·생윤·화작"]},
+"한신대":{ot:"약술형 — 국어(10문항)+수학(5문항)",tm:80,q:["1~6번 독서·7~10번 문학 / 수Ⅰ 3문항·수Ⅱ 2문항"]},
+"한양대":{ot:"인문 언어논술(1문항) · 상경 언어논술(1)+수리논술(1)",tm:90,q:["상경: 언매·화작·독서·생윤·윤사·정법 / 수학·수Ⅰ·수Ⅱ","인문1: 화작·독서·언매·문학·생윤·사문","인문2: 화작·독서·언매·생윤·정법·사문"]},
+"홍익대":{ot:"통합교과형",tm:120,q:["오전: 국어·독서·언매·생윤·통사·정법 / 화작·독서·생윤·통사·경제·정법·사문","오후: 국어·문학·독서·언매·한국사·사문 / 국어·독서·언매·생윤·정법·통사·경제·사문"]},
+"홍익대(세종)":{ot:"통합교과형(선택형·단답형)",tm:70,q:null}
+};
+
+/* 자연논술 출제정보: 출제유형 / 시간(분) / 2026학년도 문항별 출제과목 */
+const JA = {
+"가천대":{ot:"약술형 — 국어(5문항)+수학(8문항) · 의예/한의예/약학 수학(8문항)",tm:80,q:["자연: 국어·문학·독서·화법과작문·문법 / 수학Ⅰ·수학Ⅱ","의예: 수학Ⅰ·수학Ⅱ·미적분"]},
+"가톨릭대":{ot:"수리논술 — 자연공학·간호 3문항 · 약학 3문항 · 의예 4문항",tm:"90~100",q:["자연: 수학·수Ⅱ / 수학·수Ⅱ·미적분 / 수학·수Ⅰ","약학: 수Ⅰ / 수Ⅰ·미적분 / 수Ⅱ·미적분","의예: 수Ⅰ / 수Ⅱ·미적분 / 수Ⅱ·미적분 / 수학·확률과통계"]},
+"강남대":{ot:"약술형 — 국어(3문항)+수학(7문항)",tm:60,q:["공학계: 1번 문학·2~3번 독서 / 4·5·7번 수Ⅰ·6·8~10번 수Ⅱ"]},
+"건국대":{ot:"수리논술(4문항)",tm:100,q:["수학·수Ⅰ·수Ⅱ·확통·미적"]},
+"경기대":{ot:"수리논술(2문항)",tm:100,q:["수리A: 수학·수Ⅰ / 수학·수Ⅱ","수리B: 수Ⅰ / 수Ⅱ"]},
+"경북대":{ot:"자연Ⅰ 수리+과학 통합(3문항) · 의치/수의 수리+의학논술(3문항)",tm:100,q:["자연Ⅰ: 수학 / 수학·수Ⅱ·미적 / 통합과학·물Ⅰ·화Ⅰ·생Ⅰ·지Ⅰ","자연Ⅱ: 수Ⅰ·수Ⅱ·미적 / 수Ⅱ·미적 / 생Ⅰ·생Ⅱ"]},
+"경희대":{ot:"자연 수리논술(6문항 내외) · 의학계 수리+과학논술(각 4문항 내외)",tm:120,q:["자연: 미적분 / 수학·확통 / 수학·수Ⅰ·미적분","의약학: 수리 2문항 + 과학논술(택1) 과목별 2문항 — 수Ⅰ·기하 / 수Ⅱ·확통 / 물Ⅰ·물Ⅱ / 화Ⅰ·화Ⅱ / 생Ⅰ·생Ⅱ"]},
+"고려대":{ot:"수학논술",tm:80,q:["오전: 수학·수Ⅰ·미적 / 수학·미적분 / 기하 / 확통","오후: 수Ⅱ·미적 / 수Ⅱ·미적 / 기하 / 확통"]},
+"고려대(세종)":{ot:"자연 수리논술(6문항 내외) · 약학 수리논술(3문항 내외)",tm:120,q:["자연: 수학 / 수학·수Ⅱ·미적 / 수Ⅰ·미적 / 수Ⅱ / 수학·수Ⅱ·미적 / 수Ⅰ·미적","약학: 수학·미적분·기하 / 수Ⅱ·미적"]},
+"광운대":{ot:"수리논술(2문항)",tm:120,q:["1교시: 수학·확통·수Ⅱ / 수학·수Ⅰ·수Ⅱ·미적","2교시: 수학·수Ⅰ·확통 / 수학·수Ⅰ·수Ⅱ·미적"]},
+"국민대":{ot:"단답형/단문형 서술 — 국어(2문항)+수학(8문항)",tm:90,q:["오전: 수Ⅱ/수Ⅱ·미적/미적/수Ⅱ·미적/수Ⅱ·미적/수학/수학·수Ⅰ·미적/수학·수Ⅰ/독서·문학/독서","오후1: 수Ⅰ·미적/미적/수Ⅱ·미적/수Ⅱ·미적/수Ⅰ/수학/미적/미적/국어·독서/독서","오후2: 수Ⅰ/수Ⅰ·미적/수학/미적/미적/수학·수Ⅰ/수학·수Ⅰ/수Ⅰ·미적/독서·문학/독서"]},
+"단국대":{ot:"수학 통합교과형(2문항)",tm:120,q:["오전: 수학·미적분","오후: 수Ⅱ·미적분"]},
+"덕성여대":{ot:"자연 수리논술(2문항) · 약학 수리논술(3문항)",tm:90,q:["자연Ⅰ: 수학·수Ⅰ / 수학·수Ⅱ","자연Ⅱ(약학): 수학·수Ⅰ / 수학·수Ⅱ"]},
+"동국대":{ot:"수리논술(3문항)",tm:90,q:["기하 / 수Ⅰ·미적 / 수Ⅱ·미적"]},
+"동덕여대":{ot:"약술형 — 국어(2문항)+수학(6문항)",tm:60,q:["수Ⅰ·수Ⅱ·미적 / 수학·수Ⅰ / 수Ⅱ"]},
+"부산대":{ot:"자연 수리논술(3문항) · 의예/약학 수리논술(3문항)",tm:100,q:["자연: 수학 / 수학·수Ⅱ / 수Ⅰ·미적","의약학: 수학·수Ⅱ / 수Ⅱ·미적 / 수Ⅰ·기하"]},
+"삼육대":{ot:"자연 약술형 국어(5)+수학(8) · 약학 수학(8문항)",tm:80,q:["자연: 화작·언매·독서·독서·문학·문학·수Ⅰ·수Ⅰ·수Ⅰ·수Ⅱ·수Ⅱ·수Ⅱ·수Ⅰ수Ⅱ·수Ⅱ"]},
+"상명대":{ot:"약술형 — 국어(2문항)+수학(8문항)",tm:60,q:["A형: 수Ⅰ·수Ⅰ·수Ⅰ·수Ⅰ·수Ⅱ·수Ⅱ·수Ⅱ·수Ⅱ·독서·언매","B형: 수Ⅰ·수Ⅰ·수Ⅰ·수Ⅰ·수Ⅱ·수Ⅱ·수Ⅱ·수Ⅱ·독서·언매"]},
+"서강대":{ot:"수리논술(2문항)",tm:100,q:["1차: 수학·수Ⅰ·수Ⅱ·미적 / 수Ⅰ·수Ⅱ·미적","2차: 수학·수Ⅰ·수Ⅱ·미적 / 수학·수Ⅱ·미적"]},
+"서울과기대":{ot:"수리논술(3문항)",tm:100,q:["수학·수Ⅰ·수Ⅱ / 수학·수Ⅰ·수Ⅱ / 수학·수Ⅱ"]},
+"서울시립대":{ot:"수리논술(4문항)",tm:120,q:["미적분 / 미적분·기하 / 미적분 / 수Ⅰ·확통"]},
+"서울여대":{ot:"수리논술(2~4문항)",tm:90,q:["수학·수Ⅰ / 수학·수Ⅱ"]},
+"성균관대":{ot:"수리논술(3문항)",tm:100,q:["1교시: 수Ⅱ / 수학·수Ⅰ·수Ⅱ / 수학·수Ⅰ","2교시: 수학·수Ⅱ / 수학·수Ⅰ·수Ⅱ / 수학·수Ⅰ·수Ⅱ","3교시: 수학·수Ⅱ / 수학·수Ⅰ / 수학·수Ⅱ"]},
+"성신여대":{ot:"수리논술(4문항 이내)",tm:100,q:["미적분 / 수학·수Ⅱ / 수학·수Ⅱ·미적분 / 수Ⅰ·미적분"]},
+"세종대":{ot:"수리논술 · 자유전공 통합교과형",tm:120,q:["자연: 수Ⅱ·미적 / 수학·수Ⅱ·미적 / 수Ⅰ·수Ⅱ·미적","자유전공: 사문·화작·생윤 / 미적분"]},
+"수원대":{ot:"약술형 — 국어(5문항)+수학(10문항)",tm:80,q:["A·B형: 1~3번 독서·4~5번 문학·6~9번 수Ⅰ·10~15번 수Ⅱ"]},
+"숙명여대":{ot:"통합논술(3문항)",tm:100,q:["자연: 수학·수Ⅱ·미적 / 수학·수Ⅰ·미적 / 수학·수Ⅱ·미적","약학부: 수학·수Ⅱ·미적 / 수학·수Ⅰ·미적 / 수학·미적"]},
+"숭실대":{ot:"수리논술(2~4문항)",tm:100,q:["수학·수Ⅱ·미적 / 수학·수Ⅰ·미적 / 수Ⅰ / 수학"]},
+"아주대":{ot:"자연(약학 포함) 수리논술(2문항) · 의학 수리+과학(생명과학)논술(2문항)",tm:120,q:["오전: 수학·수Ⅱ·미적 / 수학·수Ⅰ·수Ⅱ·미적","오후: 수학·수Ⅰ·미적 / 수학·수Ⅰ·수Ⅱ·미적","의학: 수학·수Ⅱ·미적 / 생Ⅰ·생Ⅱ","약학: 수학·수Ⅰ·수Ⅱ / 수학·수Ⅰ·수Ⅱ·미적"]},
+"연세대":{ot:"수리+과학 논술",tm:120,q:["수학·확통 / 확통·미적분 / 수학·수Ⅱ·미적분 / 수학·기하·미적 / 수Ⅱ·미적분"]},
+"연세대(미래)":{ot:"수리논술(3문항)",tm:120,q:["창의인재: 수학·미적 / 수Ⅰ·미적 / 수Ⅰ·수Ⅱ","창의인재(의예): 확통 / 수Ⅰ·미적 / 수Ⅰ·미적·기하"]},
+"이화여대":{ot:"수리논술",tm:100,q:["자연Ⅰ: 수학·수Ⅰ·수Ⅱ·미적 / 수학·수Ⅰ·수Ⅱ·미적 / 수Ⅱ·미적","자연Ⅱ: 수학·수Ⅰ·수Ⅱ·미적 / 수Ⅱ·미적 / 수학"]},
+"인하대":{ot:"수리논술",tm:100,q:["오전: 수학·미적 / 수Ⅱ·미적 / 수학·수Ⅱ","오후: 수Ⅱ·미적 / 수학·수Ⅱ·미적 / 수Ⅱ·미적","의예(오후): 수Ⅱ·미적 / 수학·수Ⅰ / 수Ⅱ"]},
+"중앙대(창의)":{ot:"자연 수리논술(4문항) · 의예/약학 수리논술(5문항)",tm:120,q:["자연Ⅰ: 확통 / 수학·수Ⅱ·미적 / 미적 / 수Ⅰ·기하","자연Ⅱ: 확통 / 수Ⅰ·수Ⅱ·미적 / 미적 / 수Ⅰ·기하"]},
+"중앙대(일반)":{ot:"자연 수리논술(6문항) · 의예/약학 수리논술(8문항)",tm:120,q:["자연Ⅰ: 확통 / 수학·수Ⅱ·미적 / 미적 / 수Ⅰ·기하","자연Ⅱ: 확통 / 수Ⅰ·수Ⅱ·미적 / 미적 / 수Ⅰ·기하"]},
+"한국공학대":{ot:"수리논술(9문항)",tm:80,q:["1~4번 수Ⅰ·5~9번 수Ⅱ"]},
+"한국기술교대":{ot:"약술형 — 수학(10문항)",tm:80,q:["수Ⅰ(4문항)·수Ⅱ(6문항)"]},
+"한국외국어대":{ot:"수리논술(7문항)",tm:90,q:["수Ⅰ(4문항)·수Ⅱ(3문항)"]},
+"한국외국어대(글로벌)":{ot:"수리논술(7문항) (글로벌 포함)",tm:90,q:["수Ⅰ(4문항)·수Ⅱ(3문항)"]},
+"한국항공대":{ot:"수리논술(2문항)",tm:90,q:["공학: 수학·수Ⅰ·수Ⅱ·미적분 / 수학·수Ⅰ·미적","이학: 수학·수Ⅰ·수Ⅱ / 수학·수Ⅰ·수Ⅱ"]},
+"한신대":{ot:"약술형 — 국어(5문항)+수학(10문항)",tm:80,q:["1~4번 독서·5번 문학 / 수Ⅰ 6문항·수Ⅱ 4문항"]},
+"한양대":{ot:"수리논술(2문항)",tm:90,q:["오전: 수학·수Ⅰ·수Ⅱ / 수학·수Ⅰ·수Ⅱ·미적","오후1: 수Ⅰ·미적 / 기하","오후2: 수학·수Ⅰ·미적·기하 / 수학·수Ⅰ·수Ⅱ·미적·기하"]},
+"홍익대":{ot:"수리논술",tm:120,q:["수Ⅰ·미적·기하 / 수Ⅰ·확통 / 기하"]},
+"신한대":{ot:"전 계열 — 국어(7문항)+수학(7문항) (인문·자연 공통)",tm:80,q:["1~2번 문학·3~7번 독서·8~9번 문학 / 10~12번 수Ⅰ·13~15번 수Ⅱ"]},
+"을지대":{ot:"전 모집단위 — 약술형 국어(7문항)+수학(7문항) (인문·자연 공통)",tm:70,q:["1~7번 언매·독서·문학 / 8~14번 수Ⅰ·수Ⅱ"]},
+"홍익대(세종)":{ot:"약술형 — 수학(7문항)",tm:70,q:["1~7번 수Ⅰ·수Ⅱ"]}
+};
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+/* ===== 동시 비교 (같은 날 교시 병행 응시) ===== */
+const CMPDATA=(function(){
+  function pt(t){const m=[...t.matchAll(/(\d{1,2}):(\d{2})/g)]; if(!m.length)return {s:null,e:null};
+    const s=+m[0][1]*60+ +m[0][2]; const e=m[1]?(+m[1][1]*60+ +m[1][2]):null; return {s,e};}
+  const by={};
+  for(const[name,v] of Object.entries(SES)){ if(v.ref) continue;
+    const disp=name==="한국외국어대"?"한국외대(서울·글로벌)":name;
+    for(const r of v.rows){const tm=pt(r.t); const dm=r.d.match(/(\d+)\/(\d+)/); const key=(+dm[1])+"-"+(+dm[2]);
+      (by[key]=by[key]||[]).push({uni:disp,key:name,label:r.t,ty:r.ty,units:r.u,s:tm.s,e:tm.e});}
+  }
+  for(const k of Object.keys(by)){ if(new Set(by[k].map(x=>x.uni)).size<2) delete by[k]; }
+  return by;
+})();
+function openCompare(key){
+  const searchQ = (document.getElementById('q')?.value || '').trim().toLowerCase();
+  function matchSearchUni(uni){
+    if(!searchQ) return true;
+    return uni.toLowerCase().includes(searchQ);
+  }
+  const items=CMPDATA[key]; if(!items) return;
+  const dispKey={}; items.forEach(x=>dispKey[x.uni]=x.key);
+  const T0=480,T1=1260,SPAN=T1-T0,EST=100;
+  const fmt=x=>x==null?null:String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');
+  const tyc=ty=>/메디컬/.test(ty)?'cmd':/자연|수리|공학|ICT/.test(ty)?'cja':/인문|언어|상경|사회/.test(ty)?'cin':'cetc';
+  const ov=(a,b)=>{const ae=a.e!=null?a.e:(a.s!=null?a.s+EST:null),be=b.e!=null?b.e:(b.s!=null?b.s+EST:null); if(a.s==null||b.s==null)return null; return a.s<be&&b.s<ae;};
+  const byU={}; items.forEach(x=>(byU[x.uni]=byU[x.uni]||[]).push(x));
+  let ticks='<div class="ctl-ticks"><div class="cln"></div><div class="ctrack">';
+  for(let t=T0;t<=T1;t+=60){const l=(t-T0)/SPAN*100; ticks+='<span class="ctick" style="left:'+l.toFixed(2)+'%">'+String(t/60).padStart(2,'0')+'</span>';}
+  ticks+='</div></div>';
+  const lanes=Object.entries(byU).map(([u,arr])=>{
+    const blk=arr.map(x=>{
+      if(x.s==null) return '<div class="cblk cetc" style="left:2px;width:88px" title="'+x.label+' · '+x.units+'"><b>'+x.label+'</b><span class="cbt">미정</span></div>';
+      const e=x.e!=null?x.e:x.s+EST, l=(x.s-T0)/SPAN*100, w=Math.max((e-x.s)/SPAN*100,5), est=x.e==null?' cest':'';
+      const lab=(x.label.replace(/\s*\d{1,2}:\d{2}.*/,'')||x.ty);
+      return '<div class="cblk '+tyc(x.ty)+est+'" style="left:'+l.toFixed(2)+'%;width:'+w.toFixed(2)+'%" title="'+x.label+' · '+x.ty+' · '+x.units+'"><b>'+lab+'</b><span class="cbt">'+fmt(x.s)+(x.e?'~'+fmt(x.e):'~?')+'</span></div>';
+    }).join('');
+    return '<div class="clane"><div class="cln cmp-uni" data-uni="'+esc(dispKey[u]||u)+'" role="button" tabindex="0">'+u+'</div><div class="ctrack">'+blk+'</div></div>';
+  }).join('');
+  const us=Object.keys(byU),oks=[],unk=[];
+  for(let i=0;i<us.length;i++)for(let j=i+1;j<us.length;j++){
+    const A=byU[us[i]],B=byU[us[j]]; let combo=null,unknown=false;
+    for(const a of A)for(const b of B){const o=ov(a,b); if(o===false){const f=a.s<=b.s?[a,b]:[b,a]; if(!combo||f[0].s<combo[0].s)combo=f;} if(o===null)unknown=true;}
+    const pairHasSearch =
+      !searchQ || matchSearchUni(us[i]) || matchSearchUni(us[j]);
+    if(pairHasSearch){
+      if(combo) oks.push({a:us[i],b:us[j],c:combo}); 
+      else if(unknown) unk.push(us[i]+'↔'+us[j]);
+    }
+  }
+  let par='<div class="cpar"><div class="cparh">✅ 같은 날 같이 응시할 수 있는 조합</div>';
+  if(oks.length) par+='<ul>'+oks.map(p=>'<li><b><span class="cmp-uni" data-uni="'+esc(dispKey[p.a]||p.a)+'">'+p.a+'</span> + <span class="cmp-uni" data-uni="'+esc(dispKey[p.b]||p.b)+'">'+p.b+'</span></b> <span class="cex">'+p.c[0].uni+' '+fmt(p.c[0].s)+(p.c[0].e?'~'+fmt(p.c[0].e):'')+' 본 뒤 → '+p.c[1].uni+' '+fmt(p.c[1].s)+(p.c[1].e?'~'+fmt(p.c[1].e):'')+' 응시 가능</span></li>').join('')+'</ul>';
+  else par+='<p class="cnone">이 날은 시험 시간이 서로 겹쳐서, 두 학교를 같은 날 모두 응시하기는 어려워요.</p>';
+  if(unk.length) par+='<p class="cwarn">⚠ 아직 시험 시간이 공개되지 않아 판단할 수 없는 조합: '+unk.join(', ')+'</p>';
+  par+='</div>';
+  const lab=key.replace('-','/');
+  let html='<div class="mhead"><h3>'+lab+' · 같은 날 둘 다 볼 수 있나요?</h3><button class="x" onclick="closeUni()">✕</button></div><div class="mbody">';
+  html+='<p class="cmpdesc">이 날 논술이 있는 학교들의 시험 시간을 비교했어요. 시간이 겹치지 않으면 하루에 두 학교를 모두 응시할 수 있습니다. 아래 ✅ 조합을 확인하세요.</p>';
+  html+=par;
+  html+='<div class="cmpgraph-h">🕘 시험 시간표 자세히 보기</div>';
+  html+='<p class="cmpnote">가로 막대 = 각 학교 시험 시간 · 빗금 = 종료시간 추정 · 회색 = 시험시간 미정</p>';
+  html+='<div class="ctl">'+ticks+lanes+'</div></div>';
+  const modal=document.getElementById('modal'); modal.innerHTML=html; modal.classList.add('wide'); document.getElementById('ov').classList.add('on');
+}
+function rowHTML(cls,tag,list){
+  return `<span class="row ${cls}">
+  <span class="tag">${tag}</span>` +
+  list.map(n=>{
+    const f=nameMap[n]||n;
+    const mk=SES[f]
+        ? ' <span class="sesmk" title="교시·시간 분리">⏱</span>'
+        : '';
+
+    return `<span class="uniwrap">
+        <span class="uni" data-name="${esc(n)}">${n}${mk}</span>
+    </span>`;
+  }).join("") +
+  `</span>`;
+}
+const ORDER=Object.keys(exams);
+function wd(m,d){ return new Date(2026,m-1,d).getDay(); }
+
+/* ---- desktop grid ---- */
+function buildMonth(year,m){
+  const first=new Date(year,m-1,1).getDay(), days=new Date(year,m,0).getDate();
+  let html = `
+<div class="month">
+<h2>
+<button onclick="prevMonth()" ${m===10 ? "disabled" : ""}>◀</button>
+
+<span>${year}년 ${m}월</span>
+
+<button onclick="nextMonth()" ${m===12 ? "disabled" : ""}>▶</button>
+</h2>
+
+<table class="cal">
+<thead><tr>
+`;
+  DOW.forEach((d,i)=>html+=`<th class="${i===0?'sun':i===6?'sat':''}">${d}</th>`); html+=`</tr></thead><tbody><tr>`;
+  for(let i=0;i<first;i++) html+=`<td class="empty"></td>`;
+  for(let d=1;d<=days;d++){
+    const dow=(first+d-1)%7; if(dow===0&&d!==1) html+=`</tr><tr>`;
+    const e=exams[`${m}-${d}`], dc=dow===0?'sun':dow===6?'sat':'';
+    if(e&&e.suneung) html+=`<td class="day suneung"><span class="dnum">${d}</span><div class="su-label">수능일</div><div class="su-sub">대학수학능력시험</div></td>`;
+    else if(e){ let s=`<span class="dnum">${d}</span>`; if(e.in)s+=rowHTML('inmun','인문',e.in); if(e.ja)s+=rowHTML('jayeon','자연',e.ja); if(e.md)s+=rowHTML('med','메디컬',e.md); if(CMPDATA[`${m}-${d}`])s+=`<button class="cmpbtn" onclick="openCompare('${m}-${d}')">⚖ 동시비교</button>`; html+=`<td class="day exam ${dc}">${s}</td>`; }
+    else html+=`<td class="day ${dc}"><span class="dnum">${d}</span></td>`;
+  }
+  const last=(first+days-1)%7; for(let i=last+1;i<7;i++) html+=`<td class="empty"></td>`;
+  html+=`</tr></tbody></table></div>`; return html;
+}
+/* 삭제 document.getElementById('grid').innerHTML=buildMonth(2026,10)+buildMonth(2026,11)+buildMonth(2026,12); */
+
+/*추가*/
+// 현재 보고 있는 달
+let currentYear = 2026;
+let currentMonth = 10;
+
+// 화면 출력
+function renderCalendar(){
+
+    document.getElementById("grid").innerHTML =
+        buildMonth(currentYear, currentMonth);
+
+}
+function prevMonth(){
+  if(currentMonth > 10){
+    currentMonth--;
+    renderCalendar();
+    if(typeof runSearch === "function"){
+        runSearch();
+    }
+  }
+}
+function nextMonth(){
+  if(currentMonth < 12){
+    currentMonth++;
+    renderCalendar();
+    if(typeof runSearch === "function"){
+        runSearch();
+    }
+  }
+}
+
+/* ---- mobile agenda ---- */
+function buildAgenda(){
+  let h="", curM=0;
+  ORDER.forEach(key=>{
+    const [m,d]=key.split("-").map(Number), e=exams[key], dn=wd(m,d), dc=dn===0?'sun':dn===6?'sat':'';
+    if(m!==curM){ curM=m; h+=`<div class="ag-month">${m}월</div>`; }
+    if(e.suneung){ h+=`<div class="ag-card su"><div class="ag-date">${m}/${d} (${DOW[dn]}) ★ 수능일</div><div class="ag-su-sub">대학수학능력시험</div></div>`; return; }
+    let s=""; if(e.in)s+=rowHTML('inmun','인문',e.in); if(e.ja)s+=rowHTML('jayeon','자연',e.ja); if(e.md)s+=rowHTML('med','메디컬',e.md); if(CMPDATA[key])s+=`<button class="cmpbtn" onclick="openCompare('${key}')">⚖ 동시비교</button>`;
+    h+=`<div class="ag-card"><div class="ag-date ${dc}">${m}/${d} (${DOW[dn]})</div>${s}</div>`;
+  });
+  document.getElementById('agenda').innerHTML=h;
+}
+buildAgenda();
+
+// 처음 실행
+renderCalendar();
+/*추가*/
+
+/* ---- 달력 / 리스트 뷰 토글 ---- */
+document.querySelector('.viewtoggle').addEventListener('click',e=>{
+  const b=e.target.closest('.vt'); if(!b) return;
+  document.body.classList.toggle('view-list', b.dataset.view==='list');
+  document.body.classList.toggle('view-cal',  b.dataset.view==='cal');
+  document.querySelectorAll('.vt').forEach(x=>x.classList.toggle('on',x===b));
+  window.scrollTo({top:0});
+});
+
+/* ---- 카테고리 필터 (인문/자연/메디컬) ---- */
+const FCLS={in:'inmun',ja:'jayeon',md:'med'};
+function curFlt(){ for(const f of ['in','ja','md']) if(document.body.classList.contains('flt-'+f)) return f; return 'all'; }
+function applyEmptyHide(){   /* 리스트 뷰: 필터로 비어버린 날짜 카드 숨김 */
+  const f=curFlt();
+  document.querySelectorAll('#agenda .ag-card').forEach(card=>{
+    if(card.classList.contains('su')){ card.style.display=''; return; }
+    let vis=false;
+    card.querySelectorAll('.row').forEach(r=>{ if(f==='all'||r.classList.contains(FCLS[f])) vis=true; });
+    card.style.display=vis?'':'none';
+  });
+}
+document.querySelector('.chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b) return;
+  const f=b.dataset.flt;
+  ['all','in','ja','md'].forEach(x=>document.body.classList.toggle('flt-'+x, x===f));
+  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===b));
+  applyEmptyHide();
+});
+applyEmptyHide();
+
+/* ---- 대학명 검색 (하이라이트 + 디밍) ---- */
+const qEl=document.getElementById('q'), qcountEl=document.getElementById('qcount');
+function runSearch(){
+  const q=(qEl.value||'').trim().toLowerCase();
+  const searching = q !== "";
+  const hits=new Set();
+
+  document.body.classList.toggle('searching', searching);
+
+  document.querySelectorAll('.uni').forEach(u=>{
+    const sn=u.dataset.name||'';
+    const hay=(sn+' '+(nameMap[sn]||sn)).toLowerCase();
+    const hit = searching && hay.includes(q);
+
+    u.classList.toggle('hit', hit);
+
+    if(hit) hits.add(sn);
+  });
+
+  document.querySelectorAll('.row').forEach(row=>{
+    if(!searching){
+      row.classList.remove('search-empty');
+      return;
+    }
+
+    const hasHit = !!row.querySelector('.uni.hit');
+    row.classList.toggle('search-empty', !hasHit);
+  });
+
+  document.querySelectorAll('td.day.exam').forEach(td=>{
+    if(!searching){
+      td.classList.remove('search-empty');
+      return;
+    }
+
+    const hasHit = !!td.querySelector('.uni.hit');
+    td.classList.toggle('search-empty', !hasHit);
+  });
+
+  document.querySelectorAll('#agenda .ag-card').forEach(card=>{
+    if(card.classList.contains('su')){
+      card.classList.remove('search-empty');
+      return;
+    }
+
+    if(!searching){
+      card.classList.remove('search-empty');
+      return;
+    }
+
+    const hasHit = !!card.querySelector('.uni.hit');
+    card.classList.toggle('search-empty', !hasHit);
+  });
+
+  qcountEl.textContent = !searching 
+    ? '' 
+    : (hits.size ? hits.size+'곳 일치' : '일치하는 대학 없음');
+}
+qEl.addEventListener('input',runSearch);
+document.getElementById('qx').addEventListener('click',()=>{ qEl.value=''; runSearch(); qEl.focus(); });
+
+/* ---- modal ---- */
+function tyHas(ty,c){
+  if(c==='ja') return /자연|수리|공학|ICT|이학/.test(ty);
+  if(c==='in') return /인문|언어|상경|사회|경상|예술|자유전공/.test(ty);
+  return true; // md 등은 전체
+}
+function sesBox(key,cat){
+  let s=SES[key]; if(!s) return "";
+  if(s.ref) s=SES[s.ref];
+  if(!s||!s.rows) return "";
+  let list=s.rows;
+  if(cat==='in'||cat==='ja'){ const f=list.filter(r=>tyHas(r.ty,cat)); if(!f.length) return ""; list=f; }
+  const rows=list.map(r=>`<tr><td class="sd">${r.d}</td><td class="st">${r.t}</td><td class="sy">${r.ty}</td><td class="su">${r.u}</td></tr>`).join("");
+  return `<div class="sect"><h4 class="ses">교시·시험시간별 모집단위${s.note?` <span style="font-weight:600;font-size:11px;color:var(--sub)">· ${s.note}</span>`:""}</h4><div class="box ses"><table class="sestbl"><thead><tr><th>일자</th><th>교시·시간</th><th>유형</th><th>모집단위</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function choijeBox(cls,label,c){ if(!c) return ""; let in_=`<div class="base">${c.b}</div>`; if(c.u&&c.u.length) in_+=`<ul>`+c.u.map(x=>`<li>${x}</li>`).join("")+`</ul>`; return `<div class="sect"><h4 class="${cls}">${label}</h4><div class="box ${cls}">${in_}</div></div>`; }
+function sbBox(d,cat){
+  let inner="";
+  inner+=`<div class="sbline"><div class="sk">반영비율</div><div>${d.rb}</div></div>`;
+  if(typeof d.sb==="string"){ inner+=`<div class="sbline"><div class="sk">학생부</div><div>${d.sb}</div></div>`; }
+  else{ const p=[]; if(d.sb.c)p.push(d.sb.c);
+    if(d.sb.i && cat!=='ja')p.push("인문 "+d.sb.i);
+    if(d.sb.j && cat!=='in')p.push("자연 "+d.sb.j);
+    inner+=`<div class="sbline"><div class="sk">학생부</div><div>${p.join(" · ")}${d.sb.n?`<div class="sbnote">▸ ${d.sb.n}</div>`:""}</div></div>`; }
+  inner+=`<div class="sbline"><div class="sk">학년별</div><div>${d.gb}</div></div>`;
+  return `<div class="sect"><h4 class="sb">학생부 반영</h4><div class="box sb">${inner}</div></div>`;
+}
+function inmunBox(key){
+  const x=IN[key]; if(!x) return "";
+  let inner=`<div class="sbline"><div class="sk">출제유형</div><div>${x.ot}</div></div>`;
+  inner+=`<div class="sbline"><div class="sk">시간</div><div>${x.tm}분</div></div>`;
+  if(x.q) inner+=`<div class="sbline"><div class="sk">문항별</div><div>`+x.q.map(s=>`<div class="qline">· ${s}</div>`).join("")+`</div></div>`;
+  else inner+=`<div class="sbline"><div class="sk">문항별</div><div>전년도 자료 없음</div></div>`;
+  return `<div class="sect"><h4 class="in">인문논술 출제정보 <span style="font-weight:600;font-size:11px;color:var(--sub)">· 문항별=2026학년도</span></h4><div class="box in">${inner}</div></div>`;
+}
+function jayeonBox(key){
+  const x=JA[key]; if(!x) return "";
+  let inner=`<div class="sbline"><div class="sk">출제유형</div><div>${x.ot}</div></div>`;
+  inner+=`<div class="sbline"><div class="sk">시간</div><div>${x.tm}분</div></div>`;
+  if(x.q) inner+=`<div class="sbline"><div class="sk">문항별</div><div>`+x.q.map(s=>`<div class="qline">· ${s}</div>`).join("")+`</div></div>`;
+  else inner+=`<div class="sbline"><div class="sk">문항별</div><div>전년도 자료 없음</div></div>`;
+  return `<div class="sect"><h4 class="ja">자연논술 출제정보 <span style="font-weight:600;font-size:11px;color:var(--sub)">· 문항별=2026학년도</span></h4><div class="box ja">${inner}</div></div>`;
+}
+function medBox(d){
+  return `<div class="sect"><h4 class="md">메디컬 (의·치·한·약·수의·간호)</h4><div class="box md"><ul>`+d.med.map(x=>`<li>${x}</li>`).join("")+`</ul></div></div>`;
+}
+function uniBody(key,d,cat){
+  let h=`<div class="kv"><div class="k">모집인원</div><div>${d.r}명 <span class="kv-note">· 계열 구분 없는 논술 전체 인원</span></div></div>`;
+  if(cat==='in')      h+=`<div class="kv"><div class="k">논술일</div><div>${d.i||"—"}</div></div>`;
+  else if(cat==='ja') h+=`<div class="kv"><div class="k">논술일</div><div>${d.j||"—"}</div></div>`;
+  else                h+=`<div class="kv"><div class="k">논술일</div><div>인문 ${d.i||"—"} / 자연 ${d.j||"—"}</div></div>`;
+  h+=sesBox(key,cat);
+  if(cat==='in') h+=inmunBox(key);
+  else if(cat==='ja') h+=jayeonBox(key);
+  h+=sbBox(d,cat);
+  if(cat==='in') h+=choijeBox('in','수능최저 — 인문',d.ci);
+  else if(cat==='ja') h+=choijeBox('ja','수능최저 — 자연',d.cj);
+  else if(cat==='md' && d.med&&d.med.length) h+=medBox(d);
+  return h;
+}
+function openUni(name,cat){
+  const key=nameMap[name]||name, d=U[key]; if(!d) return;
+  const avail=[];
+  if(d.ci) avail.push('in');
+  if(d.cj) avail.push('ja');
+  if(d.med&&d.med.length) avail.push('md');
+  if(!avail.length) avail.push('in');
+  let active = avail.includes(cat)? cat : avail[0];
+  const LAB={in:'인문',ja:'자연',md:'메디컬'};
+  const _m=document.getElementById('modal');
+  function render(){
+    const tabs = avail.length>1
+      ? `<div class="utabs">`+avail.map(c=>`<button class="utab ${c===active?'on':''}" data-c="${c}">${LAB[c]}</button>`).join('')+`</div>`
+      : '';
+    _m.classList.remove('wide');
+    _m.innerHTML=`<div class="mhead"><h3>${key}</h3><button class="x" onclick="closeUni()">✕</button></div><div class="mbody">${tabs}${uniBody(key,d,active)}</div>`;
+    _m.querySelectorAll('.utab').forEach(b=>b.addEventListener('click',()=>{ active=b.dataset.c; render(); }));
+  }
+  render();
+  document.getElementById('ov').classList.add('on');
+}
+function closeUni(){ document.getElementById('ov').classList.remove('on'); }
+document.body.addEventListener('click',ev=>{
+  const cu=ev.target.closest('.cmp-uni'); if(cu){ openUni(cu.dataset.uni); return; }
+  const t=ev.target.closest('.uni'); if(!t) return;
+  const row=t.closest('.row');
+  const cat = row && row.classList.contains('inmun') ? 'in'
+            : row && row.classList.contains('jayeon') ? 'ja'
+            : row && row.classList.contains('med') ? 'md' : null;
+  openUni(t.dataset.name, cat);
+});
+document.getElementById('ov').addEventListener('click',ev=>{ if(ev.target.id==='ov') closeUni(); });
+document.addEventListener('keydown',ev=>{ if(ev.key==='Escape') closeUni(); });
+</script>
+</body>
+</html>
